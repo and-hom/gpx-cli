@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/ptrv/go-gpx"
 	"errors"
+	"github.com/and-hom/gpx-cli/util"
 )
 
 func trksimpl(c *cli.Context) error {
@@ -17,7 +18,7 @@ func trksimpl(c *cli.Context) error {
 		return errors.New("Too much files")
 	}
 
-	target, err := getTarget(c.String("out"))
+	target, err := util.GetTarget(c.String("out"))
 	if (err != nil) {
 		return err
 	}
@@ -33,8 +34,8 @@ func trksimpl(c *cli.Context) error {
 	}
 	log.Infof("Removing clusters greater then %d points with distance not more then %d meters\n", minPoints, maxDist)
 
-	withGpxFiles(c.Args(), func(fileName string, gpxData *gpx.Gpx) {
-		modifyWaypointsBySegment(gpxData, target, func(wpts *[]gpx.Wpt) (*[]gpx.Wpt, bool) {
+	util.WithGpxFiles(c.Args(), func(fileName string, gpxData *gpx.Gpx) {
+		util.ModifyWaypointsBySegment(gpxData, target, func(wpts *[]gpx.Wpt) (*[]gpx.Wpt, bool) {
 			size := len(*wpts)
 			if (size == 0) {
 				return wpts, false

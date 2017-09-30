@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/ptrv/go-gpx"
 	"fmt"
+	"github.com/and-hom/gpx-cli/util"
 )
 
 func printRow(rType string, id interface{}, l float64) {
@@ -18,7 +19,7 @@ func trklen(c *cli.Context) error {
 		return nil
 	}
 	use2d := c.Bool("2d")
-	withGpxFiles(c.Args(), func(fileName string, gpxData *gpx.Gpx) {
+	util.WithGpxFiles(c.Args(), func(fileName string, gpxData *gpx.Gpx) {
 		var sumLen = float64(0)
 		for _, track := range gpxData.Tracks {
 			for sIdx, seg := range track.Segments {

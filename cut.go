@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"container/list"
 	"os"
+	"github.com/and-hom/gpx-cli/util"
 )
 
 // todo: make free args order
@@ -95,7 +96,7 @@ func trkcut(c *cli.Context) error {
 		return errors.New("Too much files")
 	}
 
-	target, err := getTarget(c.String("out"))
+	target, err := util.GetTarget(c.String("out"))
 	if (err != nil) {
 		return err
 	}
@@ -109,8 +110,8 @@ func trkcut(c *cli.Context) error {
 
 	log.Infof("Query is %v", query)
 
-	withGpxFiles(c.Args(), func(fileName string, gpxData *gpx.Gpx) {
-		modifyWaypointsBySegment(gpxData, target, func(wpts *[]gpx.Wpt) (*[]gpx.Wpt, bool) {
+	util.WithGpxFiles(c.Args(), func(fileName string, gpxData *gpx.Gpx) {
+		util.ModifyWaypointsBySegment(gpxData, target, func(wpts *[]gpx.Wpt) (*[]gpx.Wpt, bool) {
 			sq := query.getSubquery(wpts)
 
 			size := len(*wpts)

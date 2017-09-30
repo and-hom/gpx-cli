@@ -6,6 +6,7 @@ import (
 	"sort"
 	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
+	"github.com/and-hom/gpx-cli/v2"
 )
 
 func main() {
@@ -89,6 +90,33 @@ func main() {
 				cli.StringFlag{
 					Name: "out",
 					Usage: "Target file. Use '-' to print to stdout",
+				},
+			},
+		},
+		{
+			Name:        "filter",
+			Usage:       "Concat data, calculate features, apply model and remove some track parts",
+			Action:      v2.Filter,
+			Flags:       []cli.Flag{
+				cli.StringFlag{
+					Name: v2.FILTER_MODE_FLAG,
+					Usage: "Use one of n,t,s,ts - data concatenation model. " +
+						"\n\tn - to concat all poinst from all files to single segment " +
+						"(track sort by first point timestamp). " +
+						"\n\tt - preserve tracks, but concat segments inside each track. " +
+						"\n\ts - preserve segments but put it into one track order by first point timestamp." +
+						"\n\tts or st - preserve tracks and segments" +
+						"\nAll data will be processed only inside the unit - track and segment!",
+				},
+				cli.StringFlag{
+					Name: v2.FILTER_MODEL_FLAG,
+					Usage: "Select the processing model. Available are:" +
+						"\nnone - by default. Do not remove anything" +
+						"\nsimplify1 - remove track artifacts when navigator does not change position but writes track",
+				},
+				cli.StringFlag{
+					Name: v2.FILTER_MODEL_PARAMS_FLAG,
+					Usage: "model dependent-params",
 				},
 			},
 		},

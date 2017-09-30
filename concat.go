@@ -2,28 +2,14 @@ package main
 
 import (
 	"gopkg.in/urfave/cli.v1"
-	"os"
 	"sort"
 	"github.com/ptrv/go-gpx"
 	log "github.com/Sirupsen/logrus"
 	"io"
 	"encoding/xml"
 	"errors"
+	"github.com/and-hom/gpx-cli/util"
 )
-
-type ByDate []gpx.Trk
-
-func (a ByDate) Len() int {
-	return len(a)
-}
-func (a ByDate) Swap(i, j int) {
-	a[i], a[j] = a[j], a[i]
-}
-func (a ByDate) Less(i, j int) bool {
-	t1, _ := a[i].TimeBounds()
-	t2, _ := a[j].TimeBounds()
-	return t1.Before(t2)
-}
 
 type ByName []gpx.Trk
 
@@ -59,7 +45,7 @@ func concat(c *cli.Context) error {
 		return nil
 	}
 
-	target, err := getTarget(c.String("out"))
+	target, err := util.GetTarget(c.String("out"))
 	if (err != nil) {
 		return err
 	}
@@ -72,7 +58,7 @@ func concat(c *cli.Context) error {
 	if !preserveSegments {
 		target.Write([]byte("<trkseg>"))
 	}
-	withGpxFiles(c.Args(), func(_ string, gpxData *gpx.Gpx) {
+	util.WithGpxFiles(c.Args(), func(_ string, gpxData *gpx.Gpx) {
 		if len(gpxData.Waypoints) > 0 {
 			log.Warn("Some waypoints detected - will not be copied to target file")
 		}
@@ -127,24 +113,4 @@ func getOrder(c *cli.Context) (string, error) {
 		return "", errors.New("Only 'files' order supported now")
 	}
 	return orderBy, nil
-}
-
-func getTarget(targetName string) (io.WriteCloser, error) {
-	if targetName == "-" {
-		return os.Stdout, nil
-	} else {
-		// detect if file exists
-		var _, err = os.Stat(targetName)
-		if os.IsNotExist(err) {
-			target, err := os.Create(targetName)
-			if err != nil {
-				log.Errorf("Can not open target file %s: %s\n", targetName, err.Error())
-				return nil, err
-			}
-			return target, nil
-		} else {
-			log.Errorf("File %s already exists", targetName)
-			return nil, errors.New("File exists: " + targetName)
-		}
-	}
 }
